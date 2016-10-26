@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv sh
+
+# Tell RabbitMQ to leave the cluster.
+
+export RABBITMQ_NODENAME=rabbit@`hostname -i`
+
+exec s6-setuidgid rabbitmq rabbitmqctl -n $RABBITMQ_NODENAME stop_app && \
+	rabbitmqctl -n $RABBITMQ_NODENAME reset && \
+    rabbitmqctl -n $RABBITMQ_NODENAME start_app

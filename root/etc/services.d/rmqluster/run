@@ -1,0 +1,17 @@
+#!/usr/bin/with-contenv sh
+
+export RABBITMQ_NODENAME=rabbit@`hostname -i`
+
+if [ -z "$CLUSTER_WITH" ]; then
+  echo "RMQLUSTER: Running as single server"
+  while true; do sleep 60; done	
+else
+  sleep 10
+  echo "RMQLUSTER: Running as clustered server, joining $CLUSTER_WITH"
+  CLUSTER_WITH=`getent hosts $CLUSTER_WITH | awk '{ print $1 }'`
+  echo "RMQLUSTER: Resolved to $CLUSTER_WITH"
+  rabbitmqctl stop_app
+  rabbitmqctl join_cluster rabbit@$CLUSTER_WITH 
+  rabbitmqctl start_app
+  while true; do sleep 60; done
+fi
